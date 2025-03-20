@@ -77,7 +77,6 @@ function checkForWinner() {
 }
 
 function newGame() {
-    // TODO: Complete the function
     // Use clearTimeout() to clear the computer's move timeout and then set computerMoveTimeout back to 0
     clearTimeout(computerMoveTimeout);
     computerMoveTimeout = 0;
@@ -95,154 +94,40 @@ function newGame() {
 }
 
 function boardButtonClicked(button) {
-    // TODO: Complete the function
     // If playerTurn is true:
-    // Set the button's text content to "X".
-    // Add the "x" class to the button.
-    // Set the button's disabled attribute to true so the button cannot be clicked again.
-    // Call switchTurn() so the computer can take a turn.
     if (playerTurn) {
-        button.innerHTML = "X";
-        button.classList.add("x");
-        button.disabled = true;
-        switchTurn();
+        button.innerHTML = "X"; // Set the button's text content to "X".
+        button.classList.add("x"); // Add the "x" class to the button.
+        button.disabled = true; // Set the button's disabled attribute to true so the button cannot be clicked again.
+        switchTurn(); // Call switchTurn() so the computer can take a turn.
     }
 }
 
 function switchTurn() {
-    // TODO: Complete the function
-    // Call checkForWinner() to determine the game's status.
-    // If moremoves are left:
-    // If switching from the player's turn to the computer's turn, use setTimeout() to call makeComputerMove() after 1 second (1000 milliseconds). Assign the return value of setTimeout() to computerMoveTimeout.
-    // Toggle playerTurn's value from false to true or from true to false.
-    // Set the turn information paragraph's text content to "Your turn" if playerTurn is true, or "Computer's turn" if playerTurn is false.
-    let status = checkForWinner();
+    let status = checkForWinner(); // Call checkForWinner() to determine the game's status.
+    // If more moves are left:
     if (status === gameStatus.MORE_MOVES_LEFT) {
-        playerTurn = !playerTurn;
+        playerTurn = !playerTurn; // Toggle playerTurn's value from false to true or from true to false.
         if (playerTurn) {
-            document.getElementById("turnInfo").innerHTML = "Your turn";
+            document.getElementById("turnInfo").innerHTML = "Your turn"; // Set the turn information paragraph's text content to "Your turn" if playerTurn is true
         } else {
-            document.getElementById("turnInfo").innerHTML = "Computer's turn";
-            computerMoveTimeout = setTimeout(makeComputerMove, 1000);
+            document.getElementById("turnInfo").innerHTML = "Computer's turn"; // Set the turn information paragraph's text content to "Computer's turn" if playerTurn is false.
+            computerMoveTimeout = setTimeout(makeComputerMove, 1000); // If switching from the player's turn to the computer's turn, use setTimeout() to call makeComputerMove() after 1 second (1000 milliseconds). Assign the return value of setTimeout() to computerMoveTimeout.
         }
     }
     // In the case of a winner or a draw game, do the following:
-    // Set playerTurn to false to prevent the user from being able to place an X after the game is over.
-    // If the human has won, display the text "You win!" in the turn info paragraph.
-    // If the computer has won, display the text "Computer wins!" in the turn info paragraph.
-    // If the game is a draw, display the text "Draw game" in the turn info paragraph.
     else {
-        playerTurn = false;
+        playerTurn = false; // Set playerTurn to false to prevent the user from being able to place an X after the game is over.
         if (status === gameStatus.HUMAN_WINS) {
-            document.getElementById("turnInfo").innerHTML = "You win!";
+            document.getElementById("turnInfo").innerHTML = "You win!"; // If the human has won, display the text "You win!" in the turn info paragraph.
         } else if (status === gameStatus.COMPUTER_WINS) {
-            document.getElementById("turnInfo").innerHTML = "Computer wins!";
+            document.getElementById("turnInfo").innerHTML = "Computer wins!"; // If the computer has won, display the text "Computer wins!" in the turn info paragraph.
         } else {
-            document.getElementById("turnInfo").innerHTML = "Draw game";
+            document.getElementById("turnInfo").innerHTML = "Draw game"; // If the game is a draw, display the text "Draw game" in the turn info paragraph.
         }
     }
 }
 
-//Original function
-/*function makeComputerMove() {
-    // TODO: Complete the function
-    // Choose a random, available button, and set the button's text content to "O".
-    // Add the "o" class to the button.
-    // Set the button's disabled attribute to true.
-    // Call switchTurn() at the end of the function to switch back to the player's turn.
-    let buttons = getGameBoardButtons();
-    let availableButtons = [];
-    for (let button of buttons) {
-        if (button.innerHTML !== "X" && button.innerHTML !== "O") {
-            availableButtons.push(button);
-        }
-    }
-    if (availableButtons.length > 0) {
-        let randButton =
-            availableButtons[Math.floor(Math.random() * availableButtons.length)];
-        randButton.innerHTML = "O";
-        randButton.classList.add("o");
-        randButton.disabled = true;
-    }
-    switchTurn();
-}*/
-
-// AI by ChatGPT
-/*function makeComputerMove() {
-    let buttons = getGameBoardButtons();
-    let availableButtons = [];
-
-    // Find available spaces
-    for (let button of buttons) {
-        if (button.innerHTML !== "X" && button.innerHTML !== "O") {
-            availableButtons.push(button);
-        }
-    }
-
-    // AI first checks for a winning move
-    let bestMove = findBestMove("O"); // Try to win
-    if (bestMove === null) {
-        bestMove = findBestMove("X"); // Try to block player
-    }
-    if (bestMove === null) {
-        bestMove = pickStrategicMove(buttons, availableButtons); // Pick strategic move
-    }
-
-    // Make the chosen move
-    if (bestMove !== null) {
-        bestMove.innerHTML = "O";
-        bestMove.classList.add("o");
-        bestMove.disabled = true;
-    }
-
-    switchTurn(); // Give turn back to player
-}
-
-function findBestMove(symbol) {
-    let buttons = getGameBoardButtons();
-    const winPatterns = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
-        [0, 4, 8], [2, 4, 6] // Diagonals
-    ];
-
-    for (let pattern of winPatterns) {
-        let [a, b, c] = pattern;
-        let values = [buttons[a].innerHTML, buttons[b].innerHTML, buttons[c].innerHTML];
-
-        // Check if there are two of the same symbol and an empty spot
-        if (values.filter(val => val === symbol).length === 2 && values.includes("")) {
-            let emptyIndex = values.indexOf("");
-            return buttons[pattern[emptyIndex]]; // Return the button to place "O"
-        }
-    }
-    return null; // No winning/blocking move found
-}
-
-function pickStrategicMove(buttons, availableButtons) {
-    const center = 4;
-    const corners = [0, 2, 6, 8];
-    const sides = [1, 3, 5, 7];
-
-    // Prefer center if available
-    if (buttons[center].innerHTML === "") return buttons[center];
-
-    // Prefer a corner if available
-    for (let i of corners) {
-        if (buttons[i].innerHTML === "") return buttons[i];
-    }
-
-    // Prefer a side if available
-    for (let i of sides) {
-        if (buttons[i].innerHTML === "") return buttons[i];
-    }
-
-    // Fallback: Pick any available spot (shouldn't be needed)
-    return availableButtons.length > 0 ? availableButtons[0] : null;
-} */
-
-
-// AI by Claude
 function makeComputerMove() {
     let buttons = getGameBoardButtons();
     let availableButtons = [];
